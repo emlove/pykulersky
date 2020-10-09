@@ -4,7 +4,7 @@ import logging
 import math
 import queue
 
-from .exceptions import ZerprocException
+from .exceptions import PykulerskyException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ class Light():
             self.device.subscribe(CHARACTERISTIC_NOTIFY_VALUE,
                                   callback=self._handle_data)
         except pygatt.BLEError as ex:
-            raise ZerprocException() from ex
+            raise PykulerskyException() from ex
 
         _LOGGER.debug("Connected to %s", self.address)
 
@@ -51,7 +51,7 @@ class Light():
             try:
                 self.adapter.stop()
             except pygatt.BLEError as ex:
-                raise ZerprocException() from ex
+                raise PykulerskyException() from ex
             self.adapter = None
             self.device = None
 
@@ -156,7 +156,7 @@ class Light():
         try:
             self.device.char_write(uuid, value)
         except pygatt.BLEError as ex:
-            raise ZerprocException() from ex
+            raise PykulerskyException() from ex
         _LOGGER.debug("Wrote 0x%s to characteristic %s", value.hex(), uuid)
 
 

@@ -1,19 +1,19 @@
 =========
-pyzerproc
+pykulersky
 =========
 
 
-.. image:: https://img.shields.io/pypi/v/pyzerproc.svg
-        :target: https://pypi.python.org/pypi/pyzerproc
+.. image:: https://img.shields.io/pypi/v/pykulersky.svg
+        :target: https://pypi.python.org/pypi/pykulersky
 
-.. image:: https://img.shields.io/travis/emlove/pyzerproc.svg
-        :target: https://travis-ci.org/emlove/pyzerproc
+.. image:: https://img.shields.io/travis/emlove/pykulersky.svg
+        :target: https://travis-ci.org/emlove/pykulersky
 
-.. image:: https://coveralls.io/repos/emlove/pyzerproc/badge.svg
-        :target: https://coveralls.io/r/emlove/pyzerproc
+.. image:: https://coveralls.io/repos/emlove/pykulersky/badge.svg
+        :target: https://coveralls.io/r/emlove/pykulersky
 
 
-Library to control Zerproc Bluetooth LED smart string lights
+Library to control Brightech Kuler Sky Bluetooth LED smart lamps
 
 * Free software: Apache Software License 2.0
 
@@ -29,42 +29,42 @@ Features
 
 Command line usage
 ------------------
-pyzerproc ships with a command line tool that exposes the features of the library.
+pykulersky ships with a command line tool that exposes the features of the library.
 
 .. code-block:: console
 
-    $ pyzerproc discover
-    INFO:pyzerproc.discovery:Starting scan for local devices
-    INFO:pyzerproc.discovery:Discovered AA:BB:CC:00:11:22: LEDBlue-CC001122
-    INFO:pyzerproc.discovery:Discovered AA:BB:CC:33:44:55: LEDBlue-CC334455
-    INFO:pyzerproc.discovery:Scan complete
+    $ pykulersky discover
+    INFO:pykulersky.discovery:Starting scan for local devices
+    INFO:pykulersky.discovery:Discovered AA:BB:CC:00:11:22: LEDBlue-CC001122
+    INFO:pykulersky.discovery:Discovered AA:BB:CC:33:44:55: LEDBlue-CC334455
+    INFO:pykulersky.discovery:Scan complete
     AA:BB:CC:00:11:22
     AA:BB:CC:33:44:55
 
-    $ pyzerproc turn-on AA:BB:CC:00:11:22
-    INFO:pyzerproc.light:Connecting to AA:BB:CC:00:11:22
-    INFO:pyzerproc.light:Turning on AA:BB:CC:00:11:22
+    $ pykulersky turn-on AA:BB:CC:00:11:22
+    INFO:pykulersky.light:Connecting to AA:BB:CC:00:11:22
+    INFO:pykulersky.light:Turning on AA:BB:CC:00:11:22
 
-    $ pyzerproc turn-off AA:BB:CC:00:11:22
-    INFO:pyzerproc.light:Connecting to AA:BB:CC:00:11:22
-    INFO:pyzerproc.light:Turning off AA:BB:CC:00:11:22
+    $ pykulersky turn-off AA:BB:CC:00:11:22
+    INFO:pykulersky.light:Connecting to AA:BB:CC:00:11:22
+    INFO:pykulersky.light:Turning off AA:BB:CC:00:11:22
 
-    $ pyzerproc set-color AA:BB:CC:00:11:22 ff0000
-    INFO:pyzerproc.light:Connecting to AA:BB:CC:00:11:22
-    INFO:pyzerproc.light:Changing color of AA:BB:CC:00:11:22 to #ff0000
+    $ pykulersky set-color AA:BB:CC:00:11:22 ff0000
+    INFO:pykulersky.light:Connecting to AA:BB:CC:00:11:22
+    INFO:pykulersky.light:Changing color of AA:BB:CC:00:11:22 to #ff0000
 
-    $ pyzerproc set-color AA:BB:CC:00:11:22 00ff00
-    INFO:pyzerproc.light:Connecting to AA:BB:CC:00:11:22
-    INFO:pyzerproc.light:Changing color of AA:BB:CC:00:11:22 to #00ff00
+    $ pykulersky set-color AA:BB:CC:00:11:22 00ff00
+    INFO:pykulersky.light:Connecting to AA:BB:CC:00:11:22
+    INFO:pykulersky.light:Changing color of AA:BB:CC:00:11:22 to #00ff00
 
-    $ pyzerproc is-on AA:BB:CC:00:11:22
-    INFO:pyzerproc.light:Connecting to AA:BB:CC:00:11:22
-    INFO:pyzerproc.light:Got state of AA:BB:CC:00:11:22: <LightState is_on='True' color='(255, 0, 0)'>
+    $ pykulersky is-on AA:BB:CC:00:11:22
+    INFO:pykulersky.light:Connecting to AA:BB:CC:00:11:22
+    INFO:pykulersky.light:Got state of AA:BB:CC:00:11:22: <LightState is_on='True' color='(255, 0, 0)'>
     True
 
-    $ pyzerproc get-color AA:BB:CC:00:11:22
-    INFO:pyzerproc.light:Connecting to AA:BB:CC:00:11:22
-    INFO:pyzerproc.light:Got state of AA:BB:CC:00:11:22: <LightState is_on='True' color='(255, 0, 0)'>
+    $ pykulersky get-color AA:BB:CC:00:11:22
+    INFO:pykulersky.light:Connecting to AA:BB:CC:00:11:22
+    INFO:pykulersky.light:Got state of AA:BB:CC:00:11:22: <LightState is_on='True' color='(255, 0, 0)'>
     ff0000
 
 
@@ -75,9 +75,9 @@ Discover nearby devices
 
 .. code-block:: python
 
-    import pyzerproc
+    import pykulersky
 
-    lights = pyzerproc.discover(timeout=30)
+    lights = pykulersky.discover(timeout=30)
 
     for light in lights:
         print("Address: {} Name: {}".format(light.address, light.name))
@@ -87,12 +87,12 @@ Turn a light on and off
 
 .. code-block:: python
 
-    import pyzerproc
+    import pykulersky
     import time
 
     address = "AA:BB:CC:00:11:22"
 
-    light = pyzerproc.Light(address)
+    light = pykulersky.Light(address)
 
     try:
         light.connect(auto_reconnect=True)
@@ -109,12 +109,12 @@ Change the light color
 
 .. code-block:: python
 
-    import pyzerproc
+    import pykulersky
     import time
 
     address = "AA:BB:CC:00:11:22"
 
-    light = pyzerproc.Light(address)
+    light = pykulersky.Light(address)
 
     try:
         light.connect()
@@ -132,12 +132,12 @@ Get the light state
 
 .. code-block:: python
 
-    import pyzerproc
+    import pykulersky
     import time
 
     address = "AA:BB:CC:00:11:22"
 
-    light = pyzerproc.Light(address)
+    light = pykulersky.Light(address)
 
     try:
         light.connect()
@@ -154,46 +154,9 @@ Get the light state
 
 Changelog
 ---------
-0.2.5 (2020-06-24)
+0.0.1 (2020-10-09)
 ~~~~~~~~~~~~~~~~~~
-- Set full brightness to 0xFF to match vendor app
-
-0.2.4 (2020-05-09)
-~~~~~~~~~~~~~~~~~~
-- Improve RGB edge cases
-
-0.2.3 (2020-05-09)
-~~~~~~~~~~~~~~~~~~
-- Rethrow exceptions on device subscribe
-
-0.2.2 (2020-05-09)
-~~~~~~~~~~~~~~~~~~
-- Fix imports
-
-0.2.1 (2020-05-09)
-~~~~~~~~~~~~~~~~~~
-- Wrap upstream exceptions
-
-0.2.0 (2020-05-09)
-~~~~~~~~~~~~~~~~~~
-- Expose exception objects
-- Expose light address and name on discovery
-
-0.1.1 (2020-05-08)
-~~~~~~~~~~~~~~~~~~
-- Expose auto reconnect
-
-0.1.0 (2020-05-07)
-~~~~~~~~~~~~~~~~~~
-- Discover nearby devices
-
-0.0.2 (2020-05-05)
-~~~~~~~~~~~~~~~~~~
-- Get the current light state
-
-0.0.1 (2020-05-04)
-~~~~~~~~~~~~~~~~~~
-- Initial release
+- Fork from pyzerproc
 
 
 Credits

@@ -4,7 +4,7 @@
 
 from setuptools import setup, find_packages
 
-from pyzerproc import __author__, __email__, __version__
+from pykulersky import __author__, __email__, __version__
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -32,23 +32,23 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    description="Library to control Zerproc Bluetooth LED smart string lights",
+    description="Library to control Brightech Kuler Sky Bluetooth LED smart lamps",
     entry_points={
         'console_scripts': [
-            'pyzerproc=pyzerproc.cli:main',
+            'pykulersky=pykulersky.cli:main',
         ],
     },
     install_requires=requirements,
     license="Apache Software License 2.0",
     long_description=readme,
     include_package_data=True,
-    keywords='pyzerproc',
-    name='pyzerproc',
-    packages=find_packages(include=['pyzerproc', 'pyzerproc.*']),
+    keywords='pykulersky',
+    name='pykulersky',
+    packages=find_packages(include=['pykulersky', 'pykulersky.*']),
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/emlove/pyzerproc',
+    url='https://github.com/emlove/pykulersky',
     version=__version__,
     zip_safe=False,
 )

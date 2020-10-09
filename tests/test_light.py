@@ -4,7 +4,7 @@ import pytest
 
 import pygatt
 
-from pyzerproc import Light, LightState, ZerprocException
+from pykulersky import Light, LightState, PykulerskyException
 
 
 def test_connect_disconnect(adapter, device):
@@ -171,21 +171,21 @@ def test_exception_wrapping(device, adapter):
 
     adapter.start.side_effect = raise_exception
 
-    with pytest.raises(ZerprocException):
+    with pytest.raises(PykulerskyException):
         light = Light("00:11:22")
         light.connect()
 
     adapter.start.side_effect = None
     adapter.stop.side_effect = raise_exception
 
-    with pytest.raises(ZerprocException):
+    with pytest.raises(PykulerskyException):
         light = Light("00:11:22")
         light.connect()
         light.disconnect()
 
     device.char_write.side_effect = raise_exception
 
-    with pytest.raises(ZerprocException):
+    with pytest.raises(PykulerskyException):
         light = Light("00:11:22")
         light.connect()
         light.turn_on()

@@ -1,1 +1,1 @@
-"""Unit test package for pyzerproc."""
+"""Unit test package for pykulersky."""

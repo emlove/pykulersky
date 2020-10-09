@@ -2,7 +2,7 @@
 import pygatt
 import pytest
 
-from pyzerproc import discover, ZerprocException
+from pykulersky import discover, PykulerskyException
 
 
 def test_discover_devices(adapter):
@@ -49,11 +49,11 @@ def test_exception_wrapping(adapter):
 
     adapter.scan.side_effect = raise_exception
 
-    with pytest.raises(ZerprocException):
+    with pytest.raises(PykulerskyException):
         discover()
 
     adapter.scan.side_effect = None
     adapter.stop.side_effect = raise_exception
 
-    with pytest.raises(ZerprocException):
+    with pytest.raises(PykulerskyException):
         discover()

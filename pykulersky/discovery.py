@@ -2,7 +2,7 @@
 import logging
 
 from .light import Light
-from .exceptions import ZerprocException
+from .exceptions import PykulerskyException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -25,12 +25,12 @@ def discover(timeout=10):
                 lights.append(
                     Light(device['address'], device['name'].strip()))
     except pygatt.BLEError as ex:
-        raise ZerprocException() from ex
+        raise PykulerskyException() from ex
     finally:
         try:
             adapter.stop()
         except pygatt.BLEError as ex:
-            raise ZerprocException() from ex
+            raise PykulerskyException() from ex
 
     _LOGGER.info("Scan complete")
     return lights
