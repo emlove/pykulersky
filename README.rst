@@ -6,8 +6,8 @@ pykulersky
 .. image:: https://img.shields.io/pypi/v/pykulersky.svg
         :target: https://pypi.python.org/pypi/pykulersky
 
-.. image:: https://img.shields.io/travis/emlove/pykulersky.svg
-        :target: https://travis-ci.org/emlove/pykulersky
+.. image:: https://travis-ci.com/emlove/pykulersky.svg?branch=master
+        :target: https://travis-ci.com/github/emlove/pykulersky
 
 .. image:: https://coveralls.io/repos/emlove/pykulersky/badge.svg
         :target: https://coveralls.io/r/emlove/pykulersky

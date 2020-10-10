@@ -32,7 +32,8 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    description="Library to control Brightech Kuler Sky Bluetooth LED smart lamps",
+    description=(
+        "Library to control Brightech Kuler Sky Bluetooth LED smart lamps"),
     entry_points={
         'console_scripts': [
             'pykulersky=pykulersky.cli:main',
