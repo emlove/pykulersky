@@ -12,11 +12,11 @@ def test_discover_devices(adapter):
         return [
             {
                 'address': 'AA:BB:CC:11:22:33',
-                'name': 'LEDBlue-CC112233 ',
+                'name': 'Living Room',
             },
             {
                 'address': 'AA:BB:CC:44:55:66',
-                'name': 'LEDBlue-CC445566 ',
+                'name': 'Bedroom',
             },
             {
                 'address': 'DD:EE:FF:11:22:33',
@@ -32,10 +32,13 @@ def test_discover_devices(adapter):
 
     devices = discover(15)
 
-    assert devices[0].address == 'AA:BB:CC:11:22:33'
-    assert devices[0].name == 'LEDBlue-CC112233'
-    assert devices[1].address == 'AA:BB:CC:44:55:66'
-    assert devices[1].name == 'LEDBlue-CC445566'
+    assert len(devices) == 3
+    assert devices[0]['address'] == 'AA:BB:CC:11:22:33'
+    assert devices[0]['name'] == 'Living Room'
+    assert devices[1]['address'] == 'AA:BB:CC:44:55:66'
+    assert devices[1]['name'] == 'Bedroom'
+    assert devices[2]['address'] == 'DD:EE:FF:11:22:33'
+    assert devices[2]['name'] == 'Other'
 
     adapter.start.assert_called_with(reset_on_start=False)
     adapter.scan.assert_called_with(timeout=15)

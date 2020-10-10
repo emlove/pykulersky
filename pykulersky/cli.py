@@ -23,10 +23,10 @@ def main(verbose):
 
 @main.command()
 def discover():
-    """Discover nearby lights"""
-    lights = pykulersky.discover()
-    for light in lights:
-        click.echo(light.address)
+    """Discover nearby bluetooth devices"""
+    devices = pykulersky.discover()
+    for device in devices:
+        click.echo("{}: {}", device["address"], device["name"])
 
     return 0
 
@@ -63,14 +63,14 @@ def turn_off(address):
 @click.argument('address')
 @click.argument('color')
 def set_color(address, color):
-    """Set the light with the given MAC address to an RRGGBB hex color"""
+    """Set the light with the given MAC address to an RRGGBBWW hex color"""
     light = pykulersky.Light(address)
 
-    r, g, b = tuple(int(color[i:i+2], 16) for i in (0, 2, 4))
+    r, g, b, w = tuple(int(color[i:i+2], 16) for i in (0, 2, 4, 6))
 
     try:
         light.connect()
-        light.set_color(r, g, b)
+        light.set_color(r, g, b, w)
     finally:
         light.disconnect()
     return 0
