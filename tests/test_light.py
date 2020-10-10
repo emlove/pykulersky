@@ -1,10 +1,9 @@
 #!/usr/bin/env python
-import queue
 import pytest
 
 import pygatt
 
-from pykulersky import Light, LightState, PykulerskyException
+from pykulersky import Light, PykulerskyException
 
 
 def test_connect_disconnect(adapter, device):
@@ -13,9 +12,9 @@ def test_connect_disconnect(adapter, device):
     light.connect()
 
     adapter.start.assert_called_with(reset_on_start=False)
-    adapter.connect.assert_called_with("00:11:22", auto_reconnect=False)
-    device.subscribe.assert_called_with(
-        "0000ffe4-0000-1000-8000-00805f9b34fb", callback=light._handle_data)
+    adapter.connect.assert_called_with(
+        "00:11:22", auto_reconnect=False,
+        address_type=pygatt.BLEAddressType.random)
 
     light.disconnect()
 
@@ -31,37 +30,25 @@ def test_connect_disconnect(adapter, device):
     light.connect(auto_reconnect=True)
 
     adapter.start.assert_called_with(reset_on_start=False)
-    adapter.connect.assert_called_with("00:11:22", auto_reconnect=True)
+    adapter.connect.assert_called_with(
+        "00:11:22", auto_reconnect=True,
+        address_type=pygatt.BLEAddressType.random)
 
 
-def test_turn_on_not_connected(device):
+def test_get_color_not_connected(device):
     """Test the CLI."""
     light = Light("00:11:22")
 
     with pytest.raises(RuntimeError):
-        light.turn_on()
+        light.get_color()
 
 
-def test_turn_on(device):
+def test_set_color_not_connected(device):
     """Test the CLI."""
     light = Light("00:11:22")
-    light.connect()
 
-    light.turn_on()
-
-    device.char_write.assert_called_with(
-        '0000ffe9-0000-1000-8000-00805f9b34fb', b'\xCC\x23\x33')
-
-
-def test_turn_off(device):
-    """Test the CLI."""
-    light = Light("00:11:22")
-    light.connect()
-
-    light.turn_off()
-
-    device.char_write.assert_called_with(
-        '0000ffe9-0000-1000-8000-00805f9b34fb', b'\xCC\x24\x33')
+    with pytest.raises(RuntimeError):
+        light.set_color(255, 0, 0, 0)
 
 
 def test_set_color(device):
@@ -69,99 +56,49 @@ def test_set_color(device):
     light = Light("00:11:22")
     light.connect()
 
-    light.set_color(255, 255, 255)
+    light.set_color(255, 255, 255, 0)
     device.char_write.assert_called_with(
-        '0000ffe9-0000-1000-8000-00805f9b34fb',
-        b'\x56\xFF\xFF\xFF\x00\xF0\xAA')
+        '8d96b002-0002-64c2-0001-9acc4838521c',
+        b'\x02\xFF\xFF\xFF\x00')
 
-    light.set_color(64, 128, 192)
+    light.set_color(64, 128, 192, 0)
     device.char_write.assert_called_with(
-        '0000ffe9-0000-1000-8000-00805f9b34fb',
-        b'\x56\x08\x10\x18\x00\xF0\xAA')
+        '8d96b002-0002-64c2-0001-9acc4838521c',
+        b'\x02\x40\x80\xC0\x00')
 
-    # Assert that lights are always on unless zero
-    light.set_color(1, 1, 1)
+    light.set_color(0, 0, 0, 255)
     device.char_write.assert_called_with(
-        '0000ffe9-0000-1000-8000-00805f9b34fb',
-        b'\x56\x01\x01\x01\x00\xF0\xAA')
+        '8d96b002-0002-64c2-0001-9acc4838521c',
+        b'\x02\x00\x00\x00\xFF')
 
     # When called with all zeros, just turn off the light
-    light.set_color(0, 0, 0)
+    light.set_color(0, 0, 0, 0)
     device.char_write.assert_called_with(
-        '0000ffe9-0000-1000-8000-00805f9b34fb', b'\xCC\x24\x33')
+        '8d96b002-0002-64c2-0001-9acc4838521c', b'\x32\xFF\xFF\xFF\xFF')
 
     with pytest.raises(ValueError):
-        light.set_color(999, 999, 999)
+        light.set_color(999, 999, 999, 999)
 
 
-def test_get_state(device, mocker):
+def test_get_color(device, mocker):
     """Test the CLI."""
     light = Light("00:11:22")
     light.connect()
 
-    def send_response(*args, **kwargs):
-        """Simulate a response from the light"""
-        light._handle_data(
-            63, b'\x66\xe3\x24\x16\x24\x01\xff\x00\x00\x00\x01\x99')
+    device.char_read.return_value = b'\x02\x00\x00\x00\xFF'
+    color = light.get_color()
+    device.char_read.assert_called_with('8d96b002-0002-64c2-0001-9acc4838521c')
+    assert color == (0, 0, 0, 255)
 
-    device.char_write.side_effect = send_response
+    device.char_read.return_value = b'\x02\xFF\xFF\x00\x00'
+    color = light.get_color()
+    device.char_read.assert_called_with('8d96b002-0002-64c2-0001-9acc4838521c')
+    assert color == (255, 255, 0, 0)
 
-    state = light.get_state()
-    assert state.is_on is False
-    assert state.color == (255, 0, 0)
-    device.char_write.assert_called_with(
-        '0000ffe9-0000-1000-8000-00805f9b34fb',  b'\xEF\x01\x77')
-    assert state.__repr__() == "<LightState is_on='False' color='(255, 0, 0)'>"
-
-    # Ensure duplicate responses are handled
-    def send_response(*args, **kwargs):
-        """Simulate a response from the light"""
-        light._handle_data(
-            63, b'\x66\xe3\x23\x16\x24\x01\x10\x05\x1C\x00\x01\x99')
-        light._handle_data(
-            63, b'\x66\xe3\x23\x16\x24\x01\x10\x05\x1C\x00\x01\x99')
-
-    device.char_write.side_effect = send_response
-
-    state = light.get_state()
-    assert state.is_on is True
-    assert state.color == (131, 41, 230)
-    device.char_write.assert_called_with(
-        '0000ffe9-0000-1000-8000-00805f9b34fb',  b'\xEF\x01\x77')
-
-    # Ensure leftover values are discarded before querying
-    def send_response(*args, **kwargs):
-        """Simulate a response from the light"""
-        light._handle_data(
-            63, b'\x66\xe3\x00\x16\x24\x01\xFF\xFF\xFF\x00\x01\x99')
-
-    device.char_write.side_effect = send_response
-
-    state = light.get_state()
-    assert state.is_on is None
-    assert state.color == (255, 255, 255)
-    device.char_write.assert_called_with(
-        '0000ffe9-0000-1000-8000-00805f9b34fb',  b'\xEF\x01\x77')
-
-    # Test response timeout
-    device.char_write.side_effect = None
-    light.notification_queue = mocker.MagicMock()
-
-    def get_queue(*args, **kwargs):
-        """Simulate a queue timeout"""
-        raise queue.Empty()
-
-    light.notification_queue.get.side_effect = get_queue
-
-    with pytest.raises(TimeoutError):
-        state = light.get_state()
-
-
-def test_light_state_equality():
-    """Test the equality check for light state."""
-    assert LightState(True, (0, 255, 0)) != LightState(False, (0, 255, 0))
-    assert LightState(True, (0, 255, 0)) != LightState(True, (255, 255, 0))
-    assert LightState(True, (0, 255, 0)) == LightState(True, (0, 255, 0))
+    device.char_read.return_value = b'\x32\xFF\xFF\xFF\x00'
+    color = light.get_color()
+    device.char_read.assert_called_with('8d96b002-0002-64c2-0001-9acc4838521c')
+    assert color == (0, 0, 0, 0)
 
 
 def test_exception_wrapping(device, adapter):
@@ -188,4 +125,11 @@ def test_exception_wrapping(device, adapter):
     with pytest.raises(PykulerskyException):
         light = Light("00:11:22")
         light.connect()
-        light.turn_on()
+        light.set_color(0, 0, 0, 0)
+
+    device.char_read.side_effect = raise_exception
+
+    with pytest.raises(PykulerskyException):
+        light = Light("00:11:22")
+        light.connect()
+        light.get_color()

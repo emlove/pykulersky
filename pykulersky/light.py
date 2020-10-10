@@ -1,5 +1,4 @@
 """Device class"""
-from binascii import hexlify
 import logging
 
 from .exceptions import PykulerskyException
@@ -26,7 +25,7 @@ class Light():
 
         self.adapter = pygatt.GATTToolBackend()
         try:
-            self.adapter.start(reset_on_start=True)
+            self.adapter.start(reset_on_start=False)
             self.device = self.adapter.connect(
                 self.address, auto_reconnect=auto_reconnect,
                 address_type=pygatt.BLEAddressType.random)
@@ -48,18 +47,6 @@ class Light():
             self.adapter = None
             self.device = None
 
-    def turn_on(self):
-        """Turn on the light"""
-        _LOGGER.info("Turning on %s", self.address)
-        self._write(CHARACTERISTIC_COMMAND_COLOR, b'\x02\x00\x00\x00\xFF')
-        _LOGGER.debug("Turned on %s", self.address)
-
-    def turn_off(self):
-        """Turn off the light"""
-        _LOGGER.info("Turning off %s", self.address)
-        self._write(CHARACTERISTIC_COMMAND_COLOR, b'\x32\xFF\xFF\xFF\xFF')
-        _LOGGER.debug("Turned off %s", self.address)
-
     def set_color(self, r, g, b, w):
         """Set the color of the light
 
@@ -74,16 +61,15 @@ class Light():
                      self.address, r, g, b, w)
 
         if r == 0 and g == 0 and b == 0 and w == 0:
-            self.turn_off()
+            color_string = b'\x32\xFF\xFF\xFF\xFF'
         else:
-            color_string = bytes((r, g, b, w))
+            color_string = b'\x02' + bytes((r, g, b, w))
 
-            value = b'\x02' + color_string
-            self._write(CHARACTERISTIC_COMMAND_COLOR, value)
-            _LOGGER.debug("Changed color of %s", self.address)
+        self._write(CHARACTERISTIC_COMMAND_COLOR, color_string)
+        _LOGGER.debug("Changed color of %s", self.address)
 
-    def get_state(self):
-        """Get the current state of the light"""
+    def get_color(self):
+        """Get the current color of the light"""
         color_string = self._read(CHARACTERISTIC_COMMAND_COLOR)
 
         on_off_value = int(color_string[0])
@@ -93,18 +79,14 @@ class Light():
         b = int(color_string[3])
         w = int(color_string[4])
 
-        if on_off_value == 0x02:
-            is_on = True
-        elif on_off_value == 0x32:
-            is_on = False
+        if on_off_value == 0x32:
+            color = (0, 0, 0, 0)
         else:
-            is_on = None
+            color = (r, g, b, w)
 
-        state = LightState(is_on, (r, g, b, w))
+        _LOGGER.info("Got color of %s: %s", self.address, color)
 
-        _LOGGER.info("Got state of %s: %s", self.address, state)
-
-        return state
+        return color
 
     def _read(self, uuid):
         """Internal method to read from the device"""
@@ -137,22 +119,3 @@ class Light():
         except pygatt.BLEError as ex:
             raise PykulerskyException() from ex
         _LOGGER.debug("Wrote 0x%s to characteristic %s", value.hex(), uuid)
-
-
-class LightState():
-    """Represents the current state of the light"""
-    __slots__ = 'is_on', 'color',
-
-    def __init__(self, is_on, color):
-        """Create the state object"""
-        self.is_on = is_on
-        self.color = color
-
-    def __repr__(self):
-        """Return a string representation of the state object"""
-        return "<LightState is_on='{}' color='{}'>".format(
-            self.is_on, self.color)
-
-    def __eq__(self, other):
-        """Check for equality."""
-        return self.is_on == other.is_on and self.color == other.color

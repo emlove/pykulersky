@@ -33,27 +33,14 @@ def discover():
 
 @main.command()
 @click.argument('address')
-def turn_on(address):
-    """Turn on the light with the given MAC address"""
+def get_color(address):
+    """Get the current color of the light"""
     light = pykulersky.Light(address)
 
     try:
         light.connect()
-        light.turn_on()
-    finally:
-        light.disconnect()
-    return 0
-
-
-@main.command()
-@click.argument('address')
-def turn_off(address):
-    """Turn off the light with the given MAC address"""
-    light = pykulersky.Light(address)
-
-    try:
-        light.connect()
-        light.turn_off()
+        color = light.get_color()
+        click.echo(hexlify(bytes(color)))
     finally:
         light.disconnect()
     return 0
@@ -71,36 +58,6 @@ def set_color(address, color):
     try:
         light.connect()
         light.set_color(r, g, b, w)
-    finally:
-        light.disconnect()
-    return 0
-
-
-@main.command()
-@click.argument('address')
-def is_on(address):
-    """Get the current on/off status of the light"""
-    light = pykulersky.Light(address)
-
-    try:
-        light.connect()
-        state = light.get_state()
-        click.echo(state.is_on)
-    finally:
-        light.disconnect()
-    return 0
-
-
-@main.command()
-@click.argument('address')
-def get_color(address):
-    """Get the current color of the light"""
-    light = pykulersky.Light(address)
-
-    try:
-        light.connect()
-        state = light.get_state()
-        click.echo(hexlify(bytes(state.color)))
     finally:
         light.disconnect()
     return 0

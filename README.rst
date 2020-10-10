@@ -21,10 +21,9 @@ Library to control Brightech Kuler Sky Bluetooth LED smart lamps
 Features
 --------
 
-* Discover nearby devices
-* Turn lights on and off
+* Discover nearby bluetooth devices
+* Get light color
 * Set light color
-* Get light status
 
 
 Command line usage
@@ -35,43 +34,30 @@ pykulersky ships with a command line tool that exposes the features of the libra
 
     $ pykulersky discover
     INFO:pykulersky.discovery:Starting scan for local devices
-    INFO:pykulersky.discovery:Discovered AA:BB:CC:00:11:22: LEDBlue-CC001122
-    INFO:pykulersky.discovery:Discovered AA:BB:CC:33:44:55: LEDBlue-CC334455
+    INFO:pykulersky.discovery:Discovered AA:BB:CC:00:11:22: Living Room
+    INFO:pykulersky.discovery:Discovered AA:BB:CC:33:44:55: Bedroom
     INFO:pykulersky.discovery:Scan complete
-    AA:BB:CC:00:11:22
-    AA:BB:CC:33:44:55
-
-    $ pykulersky turn-on AA:BB:CC:00:11:22
-    INFO:pykulersky.light:Connecting to AA:BB:CC:00:11:22
-    INFO:pykulersky.light:Turning on AA:BB:CC:00:11:22
-
-    $ pykulersky turn-off AA:BB:CC:00:11:22
-    INFO:pykulersky.light:Connecting to AA:BB:CC:00:11:22
-    INFO:pykulersky.light:Turning off AA:BB:CC:00:11:22
-
-    $ pykulersky set-color AA:BB:CC:00:11:22 ff0000
-    INFO:pykulersky.light:Connecting to AA:BB:CC:00:11:22
-    INFO:pykulersky.light:Changing color of AA:BB:CC:00:11:22 to #ff0000
-
-    $ pykulersky set-color AA:BB:CC:00:11:22 00ff00
-    INFO:pykulersky.light:Connecting to AA:BB:CC:00:11:22
-    INFO:pykulersky.light:Changing color of AA:BB:CC:00:11:22 to #00ff00
-
-    $ pykulersky is-on AA:BB:CC:00:11:22
-    INFO:pykulersky.light:Connecting to AA:BB:CC:00:11:22
-    INFO:pykulersky.light:Got state of AA:BB:CC:00:11:22: <LightState is_on='True' color='(255, 0, 0)'>
-    True
+    AA:BB:CC:00:11:22: Living Room
+    AA:BB:CC:33:44:55: Bedroom
 
     $ pykulersky get-color AA:BB:CC:00:11:22
     INFO:pykulersky.light:Connecting to AA:BB:CC:00:11:22
-    INFO:pykulersky.light:Got state of AA:BB:CC:00:11:22: <LightState is_on='True' color='(255, 0, 0)'>
-    ff0000
+    INFO:pykulersky.light:Got color of AA:BB:CC:00:11:22: (0, 0, 0, 255)'>
+    000000ff
+
+    $ pykulersky set-color AA:BB:CC:00:11:22 ff000000
+    INFO:pykulersky.light:Connecting to AA:BB:CC:00:11:22
+    INFO:pykulersky.light:Changing color of AA:BB:CC:00:11:22 to #ff000000
+
+    $ pykulersky set-color AA:BB:CC:00:11:22 000000ff
+    INFO:pykulersky.light:Connecting to AA:BB:CC:00:11:22
+    INFO:pykulersky.light:Changing color of AA:BB:CC:00:11:22 to #000000ff
 
 
 Usage
 -----
 
-Discover nearby devices
+Discover nearby bluetooth devices
 
 .. code-block:: python
 
@@ -80,7 +66,7 @@ Discover nearby devices
     lights = pykulersky.discover(timeout=30)
 
     for light in lights:
-        print("Address: {} Name: {}".format(light.address, light.name))
+        print("Address: {} Name: {}".format(light['address'], light['name']))
 
 
 Turn a light on and off
@@ -96,11 +82,11 @@ Turn a light on and off
 
     try:
         light.connect(auto_reconnect=True)
-        light.turn_on()
+        light.set_color(0, 0, 0, 255)
 
         time.sleep(5)
 
-        light.turn_off()
+        light.set_color(0, 0, 0, 0)
     finally:
         light.disconnect()
 
@@ -120,15 +106,16 @@ Change the light color
         light.connect()
 
         while True:
-            light.set_color(255, 0, 0) # Red
+            light.set_color(255, 0, 0, 0) # Red
             time.sleep(1)
-            light.set_color(0, 255, 0) # Green
+            light.set_color(0, 255, 0, 0) # Green
             time.sleep(1)
+            light.set_color(0, 0, 0, 255) # White
     finally:
         light.disconnect()
 
 
-Get the light state
+Get the light color
 
 .. code-block:: python
 
@@ -142,12 +129,9 @@ Get the light state
     try:
         light.connect()
 
-        state = light.get_state()
+        color = light.get_color()
 
-        if state.is_on:
-            print(state.color)
-        else:
-            print("Off")
+        print(color)
     finally:
         light.disconnect()
 
