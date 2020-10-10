@@ -1,6 +1,6 @@
-=========
+==========
 pykulersky
-=========
+==========
 
 
 .. image:: https://img.shields.io/pypi/v/pykulersky.svg
@@ -138,6 +138,10 @@ Get the light color
 
 Changelog
 ---------
+0.1.0 (2020-10-09)
+~~~~~~~~~~~~~~~~~~
+- Initial release
+
 0.0.1 (2020-10-09)
 ~~~~~~~~~~~~~~~~~~
 - Fork from pyzerproc
