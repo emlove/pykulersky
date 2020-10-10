@@ -26,7 +26,7 @@ def discover():
     """Discover nearby bluetooth devices"""
     devices = pykulersky.discover()
     for device in devices:
-        click.echo("{}: {}", device["address"], device["name"])
+        click.echo("{}: {}".format(device["address"], device["name"]))
 
     return 0
 
