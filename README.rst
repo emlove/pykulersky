@@ -138,6 +138,10 @@ Get the light color
 
 Changelog
 ---------
+0.2.0 (2020-10-14)
+~~~~~~~~~~~~~~~~~~
+- Remove thread-based auto_reconnect
+
 0.1.1 (2020-10-13)
 ~~~~~~~~~~~~~~~~~~
 - Always raise PykulerskyException
