@@ -138,6 +138,10 @@ Get the light color
 
 Changelog
 ---------
+0.1.1 (2020-10-13)
+~~~~~~~~~~~~~~~~~~
+- Always raise PykulerskyException
+
 0.1.0 (2020-10-09)
 ~~~~~~~~~~~~~~~~~~
 - Initial release
