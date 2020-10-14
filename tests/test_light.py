@@ -39,7 +39,7 @@ def test_get_color_not_connected(device):
     """Test the CLI."""
     light = Light("00:11:22")
 
-    with pytest.raises(RuntimeError):
+    with pytest.raises(PykulerskyException):
         light.get_color()
 
 
@@ -47,7 +47,7 @@ def test_set_color_not_connected(device):
     """Test the CLI."""
     light = Light("00:11:22")
 
-    with pytest.raises(RuntimeError):
+    with pytest.raises(PykulerskyException):
         light.set_color(255, 0, 0, 0)
 
 

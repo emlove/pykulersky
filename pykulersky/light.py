@@ -93,7 +93,7 @@ class Light():
         import pygatt
 
         if not self.device:
-            raise RuntimeError(
+            raise PykulerskyException(
                 "Light {} is not connected".format(self.address))
 
         _LOGGER.debug("Reading from characteristic %s", uuid)
@@ -110,7 +110,7 @@ class Light():
         import pygatt
 
         if not self.device:
-            raise RuntimeError(
+            raise PykulerskyException(
                 "Light {} is not connected".format(self.address))
 
         _LOGGER.debug("Writing 0x%s to characteristic %s", value.hex(), uuid)
