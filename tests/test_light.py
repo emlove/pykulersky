@@ -6,17 +6,33 @@ import pygatt
 from pykulersky import Light, PykulerskyException
 
 
+def test_properties(adapter, device):
+    """Test the simple properties."""
+    light = Light("00:11:22", "Bedroom")
+    assert light.address == "00:11:22"
+    assert light.name == "Bedroom"
+
+
 def test_connect_disconnect(adapter, device):
     """Test the CLI."""
     light = Light("00:11:22")
+    assert light.connected is False
+
     light.connect()
+    assert light.connected is True
 
     adapter.start.assert_called_with(reset_on_start=False)
     adapter.connect.assert_called_with(
-        "00:11:22", auto_reconnect=False,
-        address_type=pygatt.BLEAddressType.random)
+        "00:11:22", address_type=pygatt.BLEAddressType.random)
+
+    # Duplicate call shouldn't try to reconnect
+    light.connect()
+
+    adapter.start.assert_called_once()
+    adapter.connect.assert_called_once()
 
     light.disconnect()
+    assert light.connected is False
 
     adapter.stop.assert_called_once()
 
@@ -24,15 +40,6 @@ def test_connect_disconnect(adapter, device):
     light.disconnect()
 
     adapter.stop.assert_called_once()
-
-    # Test auto reconnect
-    light = Light("00:11:22")
-    light.connect(auto_reconnect=True)
-
-    adapter.start.assert_called_with(reset_on_start=False)
-    adapter.connect.assert_called_with(
-        "00:11:22", auto_reconnect=True,
-        address_type=pygatt.BLEAddressType.random)
 
 
 def test_get_color_not_connected(device):

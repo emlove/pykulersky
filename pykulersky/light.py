@@ -12,40 +12,59 @@ class Light():
     """Represents one connected light"""
 
     def __init__(self, address, name=None):
-        self.address = address
-        self.name = name
-        self.adapter = None
-        self.device = None
+        self._address = address
+        self._name = name
+        self._adapter = None
+        self._device = None
 
-    def connect(self, auto_reconnect=False):
-        """Connect to this light"""
+    def connect(self):
+        """Open the connection to this light."""
         import pygatt
+
+        if self.connected:
+            return
 
         _LOGGER.info("Connecting to %s", self.address)
 
-        self.adapter = pygatt.GATTToolBackend()
+        self._adapter = pygatt.GATTToolBackend()
         try:
-            self.adapter.start(reset_on_start=False)
-            self.device = self.adapter.connect(
-                self.address, auto_reconnect=auto_reconnect,
-                address_type=pygatt.BLEAddressType.random)
-
+            self._adapter.start(reset_on_start=False)
+            self._device = self._adapter.connect(
+                self.address, address_type=pygatt.BLEAddressType.random)
         except pygatt.BLEError as ex:
+            self._adapter = None
+            self._device = None
             raise PykulerskyException() from ex
 
         _LOGGER.debug("Connected to %s", self.address)
 
     def disconnect(self):
-        """Connect to this light"""
+        """Close the connection to this light."""
         import pygatt
 
-        if self.adapter:
+        if self._adapter:
             try:
-                self.adapter.stop()
+                self._adapter.stop()
             except pygatt.BLEError as ex:
                 raise PykulerskyException() from ex
-            self.adapter = None
-            self.device = None
+            finally:
+                self._adapter = None
+                self._device = None
+
+    @property
+    def address(self):
+        """Return the mac address of this light."""
+        return self._address
+
+    @property
+    def name(self):
+        """Return the discovered name of this light."""
+        return self._name
+
+    @property
+    def connected(self):
+        """Returns true if the light is connected."""
+        return self._device is not None
 
     def set_color(self, r, g, b, w):
         """Set the color of the light
@@ -92,13 +111,13 @@ class Light():
         """Internal method to read from the device"""
         import pygatt
 
-        if not self.device:
+        if not self.connected:
             raise PykulerskyException(
                 "Light {} is not connected".format(self.address))
 
         _LOGGER.debug("Reading from characteristic %s", uuid)
         try:
-            value = self.device.char_read(uuid)
+            value = self._device.char_read(uuid)
         except pygatt.BLEError as ex:
             raise PykulerskyException() from ex
         _LOGGER.debug("Read 0x%s from characteristic %s", value.hex(), uuid)
@@ -109,13 +128,13 @@ class Light():
         """Internal method to write to the device"""
         import pygatt
 
-        if not self.device:
+        if not self.connected:
             raise PykulerskyException(
                 "Light {} is not connected".format(self.address))
 
         _LOGGER.debug("Writing 0x%s to characteristic %s", value.hex(), uuid)
         try:
-            self.device.char_write(uuid, value)
+            self._device.char_write(uuid, value)
         except pygatt.BLEError as ex:
             raise PykulerskyException() from ex
         _LOGGER.debug("Wrote 0x%s to characteristic %s", value.hex(), uuid)
