@@ -138,6 +138,10 @@ Get the light color
 
 Changelog
 ---------
+0.3.0 (2020-11-10)
+~~~~~~~~~~~~~~~~~~
+- Add workaround for firmware bug
+
 0.2.0 (2020-10-14)
 ~~~~~~~~~~~~~~~~~~
 - Remove thread-based auto_reconnect
