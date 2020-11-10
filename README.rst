@@ -138,6 +138,10 @@ Get the light color
 
 Changelog
 ---------
+0.3.1 (2020-11-10)
+~~~~~~~~~~~~~~~~~~
+- Fix connected status after broken connection
+
 0.3.0 (2020-11-10)
 ~~~~~~~~~~~~~~~~~~
 - Add workaround for firmware bug
