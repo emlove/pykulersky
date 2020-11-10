@@ -155,17 +155,22 @@ def test_exception_wrapping(device, adapter):
         light.connect()
         light.disconnect()
 
+    adapter.stop.side_effect = None
     device.char_read.return_value = b'\x02\xFF\xFF\xFF\x00'
     device.char_write.side_effect = raise_exception
 
     with pytest.raises(PykulerskyException):
         light = Light("00:11:22")
         light.connect()
+        assert light.connected
         light.set_color(0, 0, 0, 0)
+    assert not light.connected
 
     device.char_read.side_effect = raise_exception
 
     with pytest.raises(PykulerskyException):
         light = Light("00:11:22")
         light.connect()
+        assert light.connected
         light.get_color()
+    assert not light.connected

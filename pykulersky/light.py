@@ -129,6 +129,7 @@ class Light():
         try:
             value = self._device.char_read(uuid)
         except pygatt.BLEError as ex:
+            self.disconnect()
             raise PykulerskyException() from ex
         _LOGGER.debug("Read 0x%s from characteristic %s", value.hex(), uuid)
 
@@ -146,5 +147,6 @@ class Light():
         try:
             self._device.char_write(uuid, value)
         except pygatt.BLEError as ex:
+            self.disconnect()
             raise PykulerskyException() from ex
         _LOGGER.debug("Wrote 0x%s to characteristic %s", value.hex(), uuid)
