@@ -138,6 +138,10 @@ Get the light color
 
 Changelog
 ---------
+0.4.0 (2020-11-11)
+~~~~~~~~~~~~~~~~~~
+- Rename discover method to make behavior clear
+
 0.3.1 (2020-11-10)
 ~~~~~~~~~~~~~~~~~~
 - Fix connected status after broken connection
