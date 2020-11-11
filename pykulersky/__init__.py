@@ -1,5 +1,5 @@
 """Top-level package for pykulersky."""
-from .discovery import discover  # noqa: F401
+from .discovery import discover_bluetooth_devices  # noqa: F401
 from .light import Light  # noqa: F401
 from .exceptions import *  # noqa: F401, F403
 

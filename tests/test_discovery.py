@@ -2,7 +2,7 @@
 import pygatt
 import pytest
 
-from pykulersky import discover, PykulerskyException
+from pykulersky import discover_bluetooth_devices, PykulerskyException
 
 
 def test_discover_devices(adapter):
@@ -30,7 +30,7 @@ def test_discover_devices(adapter):
 
     adapter.scan.side_effect = scan
 
-    devices = discover(15)
+    devices = discover_bluetooth_devices(15)
 
     assert len(devices) == 3
     assert devices[0]['address'] == 'AA:BB:CC:11:22:33'
@@ -53,10 +53,10 @@ def test_exception_wrapping(adapter):
     adapter.scan.side_effect = raise_exception
 
     with pytest.raises(PykulerskyException):
-        discover()
+        discover_bluetooth_devices()
 
     adapter.scan.side_effect = None
     adapter.stop.side_effect = raise_exception
 
     with pytest.raises(PykulerskyException):
-        discover()
+        discover_bluetooth_devices()

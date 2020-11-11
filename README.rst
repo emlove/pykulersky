@@ -63,7 +63,7 @@ Discover nearby bluetooth devices
 
     import pykulersky
 
-    lights = pykulersky.discover(timeout=30)
+    lights = pykulersky.discover_bluetooth_devices(timeout=30)
 
     for light in lights:
         print("Address: {} Name: {}".format(light['address'], light['name']))

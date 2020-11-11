@@ -6,7 +6,7 @@ from .exceptions import PykulerskyException
 _LOGGER = logging.getLogger(__name__)
 
 
-def discover(timeout=10):
+def discover_bluetooth_devices(timeout=10):
     """Returns nearby discovered bluetooth devices."""
     _LOGGER.info("Starting scan for local bluetooth devices")
 
