@@ -61,79 +61,94 @@ Discover nearby bluetooth devices
 
 .. code-block:: python
 
+    import asyncio
     import pykulersky
 
-    lights = pykulersky.discover_bluetooth_devices(timeout=30)
 
-    for light in lights:
-        print("Address: {} Name: {}".format(light['address'], light['name']))
+    async def main():
+        lights = await pykulersky.discover(timeout=5)
+
+        for light in lights:
+            print("Address: {} Name: {}".format(light.address, light.name))
+
+    asyncio.get_event_loop().run_until_complete(main())
 
 
 Turn a light on and off
 
 .. code-block:: python
 
+    import asyncio
     import pykulersky
-    import time
 
-    address = "AA:BB:CC:00:11:22"
 
-    light = pykulersky.Light(address)
+    async def main():
+        address = "AA:BB:CC:00:11:22"
 
-    try:
-        light.connect(auto_reconnect=True)
-        light.set_color(0, 0, 0, 255)
+        light = pykulersky.Light(address)
 
-        time.sleep(5)
+        try:
+            await light.connect()
+            await light.set_color(0, 0, 0, 255)
 
-        light.set_color(0, 0, 0, 0)
-    finally:
-        light.disconnect()
+            await asyncio.sleep(5)
+
+            await light.set_color(0, 0, 0, 0)
+        finally:
+            await light.disconnect()
+
+    asyncio.get_event_loop().run_until_complete(main())
 
 
 Change the light color
 
 .. code-block:: python
 
+    import asyncio
     import pykulersky
-    import time
 
-    address = "AA:BB:CC:00:11:22"
 
-    light = pykulersky.Light(address)
+    async def main():
+        address = "AA:BB:CC:00:11:22"
 
-    try:
-        light.connect()
+        light = pykulersky.Light(address)
 
-        while True:
-            light.set_color(255, 0, 0, 0) # Red
-            time.sleep(1)
-            light.set_color(0, 255, 0, 0) # Green
-            time.sleep(1)
-            light.set_color(0, 0, 0, 255) # White
-    finally:
-        light.disconnect()
+        try:
+            await light.connect()
+            while True:
+                await light.set_color(255, 0, 0, 0) # Red
+                await asyncio.sleep(1)
+                await light.set_color(0, 255, 0, 0) # Green
+                await asyncio.sleep(1)
+                await light.set_color(0, 0, 0, 255) # White
+                await asyncio.sleep(1)
+        finally:
+            await light.disconnect()
+
+    asyncio.get_event_loop().run_until_complete(main())
 
 
 Get the light color
 
 .. code-block:: python
 
+    import asyncio
     import pykulersky
-    import time
 
-    address = "AA:BB:CC:00:11:22"
 
-    light = pykulersky.Light(address)
+    async def main():
+        address = "AA:BB:CC:00:11:22"
 
-    try:
-        light.connect()
+        light = pykulersky.Light(address)
 
-        color = light.get_color()
+        try:
+            await light.connect()
+            color = await light.get_color()
+            print(color)
+        finally:
+            await light.disconnect()
 
-        print(color)
-    finally:
-        light.disconnect()
+    asyncio.get_event_loop().run_until_complete(main())
 
 
 Changelog

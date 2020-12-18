@@ -11,7 +11,7 @@ with open('README.rst') as readme_file:
 
 requirements = [
     'Click>=7.0',
-    'pygatt[GATTTOOL]>=4.0.5',
+    'bleak>=0.10.0',
 ]
 
 setup_requirements = ['pytest-runner', ]

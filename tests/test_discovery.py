@@ -1,62 +1,63 @@
 #!/usr/bin/env python
-import pygatt
 import pytest
 
-from pykulersky import discover_bluetooth_devices, PykulerskyException
+import bleak
+
+from pykulersky import discover, PykulerskyException
 
 
-def test_discover_devices(adapter):
+@pytest.mark.asyncio
+async def test_discover_devices(scanner, client_class):
     """Test the CLI."""
-    def scan(*args, **kwargs):
+    async def scan(*args, **kwargs):
         """Simulate a scanning response"""
         return [
-            {
-                'address': 'AA:BB:CC:11:22:33',
-                'name': 'Living Room',
-            },
-            {
-                'address': 'AA:BB:CC:44:55:66',
-                'name': 'Bedroom',
-            },
-            {
-                'address': 'DD:EE:FF:11:22:33',
-                'name': 'Other',
-            },
-            {
-                'address': 'DD:EE:FF:44:55:66',
-                'name': None,
-            },
+            bleak.backends.device.BLEDevice(
+                'AA:BB:CC:11:22:33',
+                'Living Room',
+                uuids=[
+                    "8d96a001-0002-64c2-0001-9acc4838521c",
+                ],
+                manufacturer_data={}
+            ),
+            bleak.backends.device.BLEDevice(
+                address='AA:BB:CC:44:55:66',
+                name='Bedroom',
+                uuids=[
+                    "8d96a001-0002-64c2-0001-9acc4838521c",
+                ],
+                manufacturer_data={}
+            ),
+            bleak.backends.device.BLEDevice(
+                address='DD:EE:FF:11:22:33',
+                name='Other',
+                uuids=[
+                    "0000fe9f-0000-1000-8000-00805f9b34fb",
+                ],
+                manufacturer_data={}
+            ),
         ]
 
-    adapter.scan.side_effect = scan
+    scanner.discover.side_effect = scan
 
-    devices = discover_bluetooth_devices(15)
+    devices = await discover(15)
 
-    assert len(devices) == 3
-    assert devices[0]['address'] == 'AA:BB:CC:11:22:33'
-    assert devices[0]['name'] == 'Living Room'
-    assert devices[1]['address'] == 'AA:BB:CC:44:55:66'
-    assert devices[1]['name'] == 'Bedroom'
-    assert devices[2]['address'] == 'DD:EE:FF:11:22:33'
-    assert devices[2]['name'] == 'Other'
+    assert len(devices) == 2
+    assert devices[0].address == 'AA:BB:CC:11:22:33'
+    assert devices[0].name == 'Living Room'
+    assert devices[1].address == 'AA:BB:CC:44:55:66'
+    assert devices[1].name == 'Bedroom'
 
-    adapter.start.assert_called_with(reset_on_start=False)
-    adapter.scan.assert_called_with(timeout=15)
-    adapter.stop.assert_called_once()
+    scanner.discover.assert_called_with(timeout=15)
 
 
-def test_exception_wrapping(adapter):
+@pytest.mark.asyncio
+async def test_exception_wrapping(scanner):
     """Test the CLI."""
-    def raise_exception(*args, **kwargs):
-        raise pygatt.BLEError("TEST")
+    async def raise_exception(*args, **kwargs):
+        raise bleak.exc.BleakError("TEST")
 
-    adapter.scan.side_effect = raise_exception
-
-    with pytest.raises(PykulerskyException):
-        discover_bluetooth_devices()
-
-    adapter.scan.side_effect = None
-    adapter.stop.side_effect = raise_exception
+    scanner.discover.side_effect = raise_exception
 
     with pytest.raises(PykulerskyException):
-        discover_bluetooth_devices()
+        await discover()

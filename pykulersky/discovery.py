@@ -1,38 +1,38 @@
 """Device discovery code"""
 import logging
 
+from .light import Light
 from .exceptions import PykulerskyException
 
 _LOGGER = logging.getLogger(__name__)
 
+EXPECTED_SERVICES = [
+    "8d96a001-0002-64c2-0001-9acc4838521c",
+]
 
-def discover_bluetooth_devices(timeout=10):
-    """Returns nearby discovered bluetooth devices."""
-    _LOGGER.info("Starting scan for local bluetooth devices")
 
-    import pygatt
-    adapter = pygatt.GATTToolBackend()
+def is_valid_device(device):
+    """Returns true if the given device is a Kulersky light."""
+    for service in EXPECTED_SERVICES:
+        if service not in device.metadata['uuids']:
+            return False
+    return True
 
-    devices = []
+
+async def discover(timeout=10):
+    """Returns nearby discovered lights."""
+    import bleak
+
+    _LOGGER.info("Starting scan for local devices")
+
+    lights = []
     try:
-        adapter.start(reset_on_start=False)
-        for device in adapter.scan(timeout=timeout):
-            # There doesn't seem to be a way to distinguish these, so the user
-            # will have to select the correct bluetooth device
-            _LOGGER.info(
-                "Discovered %s: %s", device['address'], device['name'])
-
-            # Skip devices without a name. These devices include a name, and
-            # removing other devices reduces the noise
-            if device['name'] is not None:
-                devices.append(device)
-    except pygatt.BLEError as ex:
+        devices = await bleak.BleakScanner.discover(timeout=timeout)
+    except bleak.exc.BleakError as ex:
         raise PykulerskyException() from ex
-    finally:
-        try:
-            adapter.stop()
-        except pygatt.BLEError as ex:
-            raise PykulerskyException() from ex
+    for device in devices:
+        if is_valid_device(device):
+            lights.append(Light(device.address, device.name))
 
     _LOGGER.info("Scan complete")
-    return devices
+    return lights

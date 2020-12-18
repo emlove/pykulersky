@@ -12,44 +12,11 @@ class Light():
     """Represents one connected light"""
 
     def __init__(self, address, name=None):
+        import bleak
+
         self._address = address
         self._name = name
-        self._adapter = None
-        self._device = None
-
-    def connect(self):
-        """Open the connection to this light."""
-        import pygatt
-
-        if self.connected:
-            return
-
-        _LOGGER.info("Connecting to %s", self.address)
-
-        self._adapter = pygatt.GATTToolBackend()
-        try:
-            self._adapter.start(reset_on_start=False)
-            self._device = self._adapter.connect(
-                self.address, address_type=pygatt.BLEAddressType.random)
-        except pygatt.BLEError as ex:
-            self._adapter = None
-            self._device = None
-            raise PykulerskyException() from ex
-
-        _LOGGER.debug("Connected to %s", self.address)
-
-    def disconnect(self):
-        """Close the connection to this light."""
-        import pygatt
-
-        if self._adapter:
-            try:
-                self._adapter.stop()
-            except pygatt.BLEError as ex:
-                raise PykulerskyException() from ex
-            finally:
-                self._adapter = None
-                self._device = None
+        self._client = bleak.BleakClient(self._address)
 
     @property
     def address(self):
@@ -61,12 +28,46 @@ class Light():
         """Return the discovered name of this light."""
         return self._name
 
-    @property
-    def connected(self):
+    async def is_connected(self):
         """Returns true if the light is connected."""
-        return self._device is not None
+        import bleak
 
-    def set_color(self, r, g, b, w):
+        try:
+            return await self._client.is_connected()
+        except bleak.exc.BleakError as ex:
+            raise PykulerskyException() from ex
+
+    async def connect(self):
+        """Connect to this light"""
+        import bleak
+
+        if await self.is_connected():
+            return
+
+        _LOGGER.debug("Connecting to %s", self._address)
+
+        try:
+            await self._client.connect()
+        except bleak.exc.BleakError as ex:
+            raise PykulerskyException() from ex
+
+        _LOGGER.debug("Connected to %s", self._address)
+
+    async def disconnect(self):
+        """Close the connection to the light."""
+        import bleak
+
+        if not await self.is_connected():
+            return
+
+        _LOGGER.debug("Disconnecting from %s", self._address)
+        try:
+            await self._client.disconnect()
+        except bleak.exc.BleakError as ex:
+            raise PykulerskyException() from ex
+        _LOGGER.debug("Disconnected from %s", self._address)
+
+    async def set_color(self, r, g, b, w):
         """Set the color of the light
 
         Accepts red, green, blue, and white values from 0-255
@@ -76,7 +77,7 @@ class Light():
                 raise ValueError(
                     "Value {} is outside the valid range of 0-255")
 
-        old_color = self.get_color()
+        old_color = await self.get_color()
         was_on = max(old_color) > 0
 
         _LOGGER.info("Changing color of %s to #%02x%02x%02x%02x",
@@ -94,12 +95,12 @@ class Light():
                 self._write(CHARACTERISTIC_COMMAND_COLOR, color_string)
             color_string = b'\x02' + bytes((r, g, b, w))
 
-        self._write(CHARACTERISTIC_COMMAND_COLOR, color_string)
+        await self._write(CHARACTERISTIC_COMMAND_COLOR, color_string)
         _LOGGER.debug("Changed color of %s", self.address)
 
-    def get_color(self):
+    async def get_color(self):
         """Get the current color of the light"""
-        color_string = self._read(CHARACTERISTIC_COMMAND_COLOR)
+        color_string = await self._read(CHARACTERISTIC_COMMAND_COLOR)
 
         on_off_value = int(color_string[0])
 
@@ -117,36 +118,26 @@ class Light():
 
         return color
 
-    def _read(self, uuid):
+    async def _read(self, uuid):
         """Internal method to read from the device"""
-        import pygatt
-
-        if not self.connected:
-            raise PykulerskyException(
-                "Light {} is not connected".format(self.address))
-
         _LOGGER.debug("Reading from characteristic %s", uuid)
+        import bleak
+
         try:
-            value = self._device.char_read(uuid)
-        except pygatt.BLEError as ex:
-            self.disconnect()
+            value = await self._client.read_gatt_char(uuid)
+        except bleak.exc.BleakError as ex:
             raise PykulerskyException() from ex
         _LOGGER.debug("Read 0x%s from characteristic %s", value.hex(), uuid)
 
         return value
 
-    def _write(self, uuid, value):
+    async def _write(self, uuid, value):
         """Internal method to write to the device"""
-        import pygatt
-
-        if not self.connected:
-            raise PykulerskyException(
-                "Light {} is not connected".format(self.address))
-
         _LOGGER.debug("Writing 0x%s to characteristic %s", value.hex(), uuid)
+        import bleak
+
         try:
-            self._device.char_write(uuid, value)
-        except pygatt.BLEError as ex:
-            self.disconnect()
+            await self._client.write_gatt_char(uuid, bytearray(value))
+        except bleak.exc.BleakError as ex:
             raise PykulerskyException() from ex
         _LOGGER.debug("Wrote 0x%s to characteristic %s", value.hex(), uuid)
