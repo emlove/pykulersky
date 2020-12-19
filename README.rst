@@ -153,6 +153,10 @@ Get the light color
 
 Changelog
 ---------
+0.5.0 (2020-12-19)
+~~~~~~~~~~~~~~~~~~
+- Refactor from pygatt to bleak for async interface
+
 0.4.0 (2020-11-11)
 ~~~~~~~~~~~~~~~~~~
 - Rename discover method to make behavior clear
