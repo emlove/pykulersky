@@ -153,6 +153,10 @@ Get the light color
 
 Changelog
 ---------
+0.5.1 (2020-12-23)
+~~~~~~~~~~~~~~~~~~
+- Include default timeout on all API calls
+
 0.5.0 (2020-12-19)
 ~~~~~~~~~~~~~~~~~~
 - Refactor from pygatt to bleak for async interface
