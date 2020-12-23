@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import asyncio
+import asynctest
 import pytest
 
 import bleak
@@ -16,14 +18,6 @@ async def test_connect_disconnect(client_class, client):
     await light.connect()
     client.connect.assert_called_once()
 
-    # Duplicate call shouldn't connect again
-    await light.connect()
-    client.connect.assert_called_once()
-
-    await light.disconnect()
-    client.disconnect.assert_called_once()
-
-    # Duplicate disconnect shouldn't call stop again
     await light.disconnect()
     client.disconnect.assert_called_once()
 
@@ -49,6 +43,16 @@ async def test_disconnect_exception(client):
 
     with pytest.raises(PykulerskyException):
         await light.disconnect()
+
+
+@pytest.mark.asyncio
+async def test_is_connected(client):
+    """Test an exception while connecting."""
+    light = Light("00:11:22")
+
+    client.is_connected.side_effect = asyncio.TimeoutError("TEST")
+
+    assert not await light.is_connected()
 
 
 @pytest.mark.asyncio
@@ -144,7 +148,19 @@ async def test_exception_wrapping(client):
     with pytest.raises(PykulerskyException):
         await light.set_color(255, 255, 255, 255)
 
+    light._do_set_color = asynctest.MagicMock()
+    light._do_set_color.side_effect = asyncio.TimeoutError("Mock timeout")
+
+    with pytest.raises(PykulerskyException):
+        await light.set_color(255, 255, 255, 255)
+
     client.read_gatt_char.side_effect = bleak.exc.BleakError("TEST")
+
+    with pytest.raises(PykulerskyException):
+        await light.get_color()
+
+    light._do_get_color = asynctest.MagicMock()
+    light._do_get_color.side_effect = asyncio.TimeoutError("Mock timeout")
 
     with pytest.raises(PykulerskyException):
         await light.get_color()

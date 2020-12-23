@@ -48,7 +48,7 @@ async def test_discover_devices(scanner, client_class):
     assert devices[1].address == 'AA:BB:CC:44:55:66'
     assert devices[1].name == 'Bedroom'
 
-    scanner.discover.assert_called_with(timeout=15)
+    scanner.discover.assert_called_once()
 
 
 @pytest.mark.asyncio

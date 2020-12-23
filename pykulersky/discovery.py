@@ -1,4 +1,5 @@
 """Device discovery code"""
+import asyncio
 import logging
 
 from .light import Light
@@ -27,8 +28,10 @@ async def discover(timeout=10):
 
     lights = []
     try:
-        devices = await bleak.BleakScanner.discover(timeout=timeout)
-    except bleak.exc.BleakError as ex:
+        devices = await asyncio.wait_for(
+            bleak.BleakScanner.discover(),
+            timeout)
+    except Exception as ex:
         raise PykulerskyException() from ex
     for device in devices:
         if is_valid_device(device):
