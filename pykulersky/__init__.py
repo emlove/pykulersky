@@ -5,4 +5,4 @@ from .exceptions import *  # noqa: F401, F403
 
 __author__ = """Emily Mills"""
 __email__ = 'emily@emlove.me'
-__version__ = '0.5.1'
+__version__ = '0.5.2'

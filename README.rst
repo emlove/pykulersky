@@ -153,6 +153,10 @@ Get the light color
 
 Changelog
 ---------
+0.5.2 (2021-03-04)
+~~~~~~~~~~~~~~~~~~
+- Use built-in asyncmock for Python 3.8+
+
 0.5.1 (2020-12-23)
 ~~~~~~~~~~~~~~~~~~
 - Include default timeout on all API calls
