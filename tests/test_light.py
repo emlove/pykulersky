@@ -5,7 +5,7 @@ import pytest
 import bleak
 
 from pykulersky import Light, PykulerskyException
-from .conftest import MagicMock
+from .conftest import AsyncMock
 
 
 @pytest.mark.asyncio
@@ -148,7 +148,7 @@ async def test_exception_wrapping(client):
     with pytest.raises(PykulerskyException):
         await light.set_color(255, 255, 255, 255)
 
-    light._do_set_color = MagicMock()
+    light._do_set_color = AsyncMock()
     light._do_set_color.side_effect = asyncio.TimeoutError("Mock timeout")
 
     with pytest.raises(PykulerskyException):
@@ -159,7 +159,7 @@ async def test_exception_wrapping(client):
     with pytest.raises(PykulerskyException):
         await light.get_color()
 
-    light._do_get_color = MagicMock()
+    light._do_get_color = AsyncMock()
     light._do_get_color.side_effect = asyncio.TimeoutError("Mock timeout")
 
     with pytest.raises(PykulerskyException):
