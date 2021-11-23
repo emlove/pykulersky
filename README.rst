@@ -153,6 +153,10 @@ Get the light color
 
 Changelog
 ---------
+0.5.3 (2021-11-23)
+~~~~~~~~~~~~~~~~~~
+- Support CI for bleak 0.13
+
 0.5.2 (2021-03-04)
 ~~~~~~~~~~~~~~~~~~
 - Use built-in asyncmock for Python 3.8+
