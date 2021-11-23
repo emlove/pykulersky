@@ -11,7 +11,7 @@ with open('README.rst') as readme_file:
 
 requirements = [
     'Click>=7.0',
-    'bleak>=0.10.0',
+    'bleak>=0.11.0',
 ]
 
 test_requirements = ['pytest>=3', ]
@@ -26,9 +26,9 @@ setup(
         'License :: OSI Approved :: Apache Software License',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
     description=(
         "Library to control Brightech Kuler Sky Bluetooth LED smart lamps"),
