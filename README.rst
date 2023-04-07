@@ -153,6 +153,10 @@ Get the light color
 
 Changelog
 ---------
+0.5.5 (2023-04-07)
+~~~~~~~~~~~~~~~~~~
+- Support CI for bleak 0.20
+
 0.5.4 (2022-05-03)
 ~~~~~~~~~~~~~~~~~~
 - Unpin test dependencies
