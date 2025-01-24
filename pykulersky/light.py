@@ -95,7 +95,7 @@ class Light():
                 # to zero. If the light was off, first apply the color with a
                 # zero white channel, then write the actual color we want.
                 color_string = b'\x02' + bytes((r, g, b, 0))
-                self._write(CHARACTERISTIC_COMMAND_COLOR, color_string)
+                await self._write(CHARACTERISTIC_COMMAND_COLOR, color_string)
             color_string = b'\x02' + bytes((r, g, b, w))
 
         await self._write(CHARACTERISTIC_COMMAND_COLOR, color_string)
