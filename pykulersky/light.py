@@ -15,13 +15,13 @@ DEFAULT_TIMEOUT = 5
 class Light():
     """Represents one connected light"""
 
-    def __init__(self, address, name=None, *args,
+    def __init__(self, address_or_ble_device, name=None, *args,
                  default_timeout=DEFAULT_TIMEOUT):
         import bleak
 
-        self._address = address
+        self._address = getattr(address_or_ble_device, 'address', address_or_ble_device)
         self._name = name
-        self._client = bleak.BleakClient(self._address)
+        self._client = bleak.BleakClient(address_or_ble_device)
         self._default_timeout = DEFAULT_TIMEOUT
 
     @property
