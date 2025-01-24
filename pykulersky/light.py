@@ -19,7 +19,11 @@ class Light():
                  default_timeout=DEFAULT_TIMEOUT):
         import bleak
 
-        self._address = getattr(address_or_ble_device, 'address', address_or_ble_device)
+        self._address = getattr(
+            address_or_ble_device,
+            'address',
+            address_or_ble_device
+        )
         self._name = name
         self._client = bleak.BleakClient(address_or_ble_device)
         self._default_timeout = DEFAULT_TIMEOUT

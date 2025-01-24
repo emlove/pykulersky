@@ -1,10 +1,6 @@
 import pytest
-import sys
 
-if sys.version_info[:2] < (3, 8):
-    from asynctest import patch, CoroutineMock, MagicMock as AsyncMock
-else:
-    from unittest.mock import patch, AsyncMock
+from unittest.mock import patch, AsyncMock
 
 
 @pytest.fixture
@@ -17,10 +13,6 @@ def client_class():
 def client(client_class):
     client = AsyncMock()
     client_class.return_value = client
-
-    if sys.version_info[:2] < (3, 8):
-        client.read_gatt_char = CoroutineMock()
-        client.write_gatt_char = CoroutineMock()
 
     connected = False
 
