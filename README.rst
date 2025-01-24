@@ -153,6 +153,10 @@ Get the light color
 
 Changelog
 ---------
+0.5.7 (2025-01-24)
+~~~~~~~~~~~~~~~~~~
+- Lower noisy log priorities
+
 0.5.6 (2025-01-24)
 ~~~~~~~~~~~~~~~~~~
 - Allow bleak device to be passed through
