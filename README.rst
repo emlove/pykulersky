@@ -153,6 +153,10 @@ Get the light color
 
 Changelog
 ---------
+0.5.8 (2025-01-24)
+~~~~~~~~~~~~~~~~~~
+- Fix missing awaits
+
 0.5.7 (2025-01-24)
 ~~~~~~~~~~~~~~~~~~
 - Lower noisy log priorities
