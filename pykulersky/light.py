@@ -83,8 +83,8 @@ class Light():
         old_color = await self._do_get_color()
         was_on = max(old_color) > 0
 
-        _LOGGER.info("Changing color of %s to #%02x%02x%02x%02x",
-                     self.address, r, g, b, w)
+        _LOGGER.debug("Changing color of %s to #%02x%02x%02x%02x",
+                      self.address, r, g, b, w)
 
         if r == 0 and g == 0 and b == 0 and w == 0:
             color_string = b'\x32\xFF\xFF\xFF\xFF'
@@ -129,7 +129,7 @@ class Light():
         else:
             color = (r, g, b, w)
 
-        _LOGGER.info("Got color of %s: %s", self.address, color)
+        _LOGGER.debug("Got color of %s: %s", self.address, color)
 
         return color
 
