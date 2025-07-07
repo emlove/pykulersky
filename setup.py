@@ -11,7 +11,7 @@ with open('README.rst') as readme_file:
 
 requirements = [
     'Click>=7.0',
-    'bleak>=0.20.0',
+    'bleak>=1.0.1',
 ]
 
 test_requirements = ['pytest>=3', ]

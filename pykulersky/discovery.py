@@ -12,14 +12,6 @@ EXPECTED_SERVICES = [
 ]
 
 
-def is_valid_device(device):
-    """Returns true if the given device is a Kulersky light."""
-    for service in EXPECTED_SERVICES:
-        if service not in device.metadata['uuids']:
-            return False
-    return True
-
-
 async def discover(timeout=10):
     """Returns nearby discovered lights."""
     import bleak
@@ -29,13 +21,12 @@ async def discover(timeout=10):
     lights = []
     try:
         devices = await asyncio.wait_for(
-            bleak.BleakScanner.discover(),
+            bleak.BleakScanner.discover(service_uuids=EXPECTED_SERVICES),
             timeout)
     except Exception as ex:
         raise PykulerskyException() from ex
     for device in devices:
-        if is_valid_device(device):
-            lights.append(Light(device.address, device.name))
+        lights.append(Light(device.address, device.name))
 
     _LOGGER.info("Scan complete")
     return lights

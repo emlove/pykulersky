@@ -17,7 +17,6 @@ def client(client_class):
     connected = False
 
     async def is_connected():
-        nonlocal connected
         return connected
 
     async def connect():

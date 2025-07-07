@@ -16,7 +16,6 @@ async def test_discover_devices(scanner, client_class):
                 'AA:BB:CC:11:22:33',
                 'Living Room',
                 {},
-                0,
                 uuids=[
                     "8d96a001-0002-64c2-0001-9acc4838521c",
                 ],
@@ -25,18 +24,8 @@ async def test_discover_devices(scanner, client_class):
                 'AA:BB:CC:44:55:66',
                 'Bedroom',
                 {},
-                0,
                 uuids=[
                     "8d96a001-0002-64c2-0001-9acc4838521c",
-                ],
-            ),
-            bleak.backends.device.BLEDevice(
-                'DD:EE:FF:11:22:33',
-                'Other',
-                {},
-                0,
-                uuids=[
-                    "0000fe9f-0000-1000-8000-00805f9b34fb",
                 ],
             ),
         ]
