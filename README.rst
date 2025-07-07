@@ -153,6 +153,10 @@ Get the light color
 
 Changelog
 ---------
+0.6.0 (2025-07-07)
+~~~~~~~~~~~~~~~~~~
+- Update to support bleak 1.0
+
 0.5.8 (2025-01-24)
 ~~~~~~~~~~~~~~~~~~
 - Fix missing awaits
